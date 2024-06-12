@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-      
+
     env:
       ENVIRONMENT: staging
       DOMAIN: ${{ secrets.DOMAIN_STAGING }}
@@ -22,24 +22,24 @@ jobs:
       EMAILS_FROM_EMAIL: ${{ secrets.EMAILS_FROM_EMAIL }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-      
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          path: devi_crm  # Checkout into a subdirectory called devi_crm
+          path: .  # Checkout to the current directory
 
-      - name: Pull latest changes
+      - name: Sync repository to target directory
         run: |
-          cd $GITHUB_WORKSPACE/devi_crm
-          git pull origin main  # Ensure the latest changes are pulled
+          rsync -a --delete $GITHUB_WORKSPACE/ /home/ubuntu/devi_crm/
 
       - name: Build Docker containers
         run: |
-          cd $GITHUB_WORKSPACE/devi_crm
+          cd /home/ubuntu/devi_crm
           docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} build
 
       - name: Restart Docker containers
         run: |
-          cd $GITHUB_WORKSPACE/devi_crm
-          docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} up  # Restart containers in detached mode
+          cd /home/ubuntu/devi_crm
+          docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} up -d
+
