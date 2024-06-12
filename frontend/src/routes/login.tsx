@@ -76,7 +76,7 @@ function Login() {
         gap={4}
         centerContent
       >
-      <p>First messege</p>
+      <p>second messege</p>
         <Image
           src={Logo}
           alt="FastAPI logo"
