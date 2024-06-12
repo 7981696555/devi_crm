@@ -42,4 +42,4 @@ jobs:
       - name: Restart Docker containers
         run: |
           cd $GITHUB_WORKSPACE/devi_crm
-          docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} up -d  # Restart containers in detached mode
+          docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} up  # Restart containers in detached mode
