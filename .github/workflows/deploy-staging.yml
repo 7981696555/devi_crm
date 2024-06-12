@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
+
     env:
       ENVIRONMENT: staging
       DOMAIN: ${{ secrets.DOMAIN_STAGING }}
@@ -21,26 +22,25 @@ jobs:
       EMAILS_FROM_EMAIL: ${{ secrets.EMAILS_FROM_EMAIL }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          path: /home/ubuntu/devi_crm/devi_crm/devi_crm
-          fetch-depth: 1
 
-      - name: Pull latest changes
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Docker Login
         run: |
-          cd ~/home/ubuntu/devi_crm/devi_crm/devi_crm
-          git fetch origin main
-          git reset --hard origin/main
+          echo "${{ secrets.DOCKER_USERNAME }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin ${{ secrets.DOCKER_REGISTRY }}
+
+      - name: Sync repository to target directory
+        run: |
+          rsync -a --delete ${{ github.workspace }}/ /home/ubuntu/devi_crm/
 
       - name: Build Docker containers
         run: |
-          cd ~/actions-runner/home/ubuntu/devi_crm
-          sudo docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} build
+          cd /home/ubuntu/devi_crm
+          docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} build
 
-      - name: Deploy Docker containers
+      - name: Restart Docker containers
         run: |
-          cd ~/actions-runner/home/ubuntu/devi_crm/devi_crm/devi_crm
-          sudo docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} up
+          cd /home/ubuntu/devi_crm
+          docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} up 
