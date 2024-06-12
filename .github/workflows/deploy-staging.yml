@@ -24,22 +24,22 @@ jobs:
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          path: /home/ubuntu/devi_crm  # Ensuring the path is correct
+          path: devi_crm  # Checkout into a subdirectory called devi_crm
 
       - name: Pull latest changes
         run: |
-          cd /home/ubuntu/devi_crm
-          git pull origin main  # Pull latest changes from the main branch
+          cd $GITHUB_WORKSPACE/devi_crm
+          git pull origin main  # Ensure the latest changes are pulled
 
       - name: Build Docker containers
         run: |
-          cd /home/ubuntu/devi_crm
+          cd $GITHUB_WORKSPACE/devi_crm
           docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} build
 
       - name: Restart Docker containers
         run: |
-          cd /home/ubuntu/devi_crm
+          cd $GITHUB_WORKSPACE/devi_crm
           docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} up -d  # Restart containers in detached mode
