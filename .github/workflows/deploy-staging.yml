@@ -31,7 +31,7 @@ jobs:
 
       - name: Pull latest changes
         run: |
-          cd ~/actions-runner/home/ubuntu/devi_crm/devi_crm/devi_crm
+          cd ~/home/ubuntu/devi_crm/devi_crm/devi_crm
           git fetch origin main
           git reset --hard origin/main
 
