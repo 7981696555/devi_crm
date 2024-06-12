@@ -8,7 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-
     env:
       ENVIRONMENT: staging
       DOMAIN: ${{ secrets.DOMAIN_STAGING }}
@@ -22,21 +21,26 @@ jobs:
       EMAILS_FROM_EMAIL: ${{ secrets.EMAILS_FROM_EMAIL }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main
+          path: /home/ubuntu/devi_crm
+          fetch-depth: 1
 
-      - name: Sync repository to target directory
+      - name: Pull latest changes
         run: |
-          rsync -a --delete ${{ github.workspace }}/ /home/ubuntu/devi_crm/
+          cd ~/actions-runner/home/ubuntu/devi_crm
+          git fetch origin main
+          git reset --hard origin/main
 
       - name: Build Docker containers
         run: |
-          cd /home/ubuntu/devi_crm
-          docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} build
+          cd ~/actions-runner/home/ubuntu/devi_crm
+          sudo docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} build
 
-      - name: Restart Docker containers
+      - name: Deploy Docker containers
         run: |
-          cd /home/ubuntu/devi_crm
-          docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} up -d
+          cd ~/actions-runner/_work/etel_crm/
+          sudo docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} up
