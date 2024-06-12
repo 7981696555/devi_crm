@@ -42,5 +42,5 @@ jobs:
 
       - name: Deploy Docker containers
         run: |
-          cd ~/actions-runner/_work/etel_crm/
+          cd ~/actions-runner/home/ubuntu/devi_crm
           sudo docker compose -f docker-compose.yml --project-name ${{ secrets.STACK_NAME_STAGING }} up
